@@ -13,7 +13,7 @@ extern "C" {
 
 #include "sqlite3ext.h"
 #include "fts3_tokenizer.h"
-
+#include <stdio.h>
 //for ictclas 
 #include "CWrapper.h"
 
@@ -24,7 +24,7 @@ extern "C" {
 
 SQLITE_EXTENSION_INIT1
 
-
+/*
 typedef struct MecabTokenizer {
     sqlite3_tokenizer base;
     mecab_t *mecab;
@@ -38,6 +38,8 @@ typedef struct MecabCursor {
     int offset;
     int pos;
 } MecabCursor;
+*/
+
 
 /*
  * Create a new tokenizer instance.
@@ -47,6 +49,8 @@ static int mecabCreate(
     const char * const *argv,       /* Tokenizer creation arguments */
     sqlite3_tokenizer **ppTokenizer /* OUT: Created tokenizer */
 ){
+
+    /*
     MecabTokenizer *p;
     mecab_t *mecab;
     p = (MecabTokenizer*) malloc(sizeof(MecabTokenizer));
@@ -61,7 +65,7 @@ static int mecabCreate(
     }
 
     *ppTokenizer = (sqlite3_tokenizer *)p;
-
+*/
     return SQLITE_OK;
 }
 
@@ -69,9 +73,11 @@ static int mecabCreate(
  * Destroy a tokenizer
  */
 static int mecabDestroy(sqlite3_tokenizer *pTokenizer){
+    /*
     MecabTokenizer *p = (MecabTokenizer *)pTokenizer;
     mecab_destroy(p->mecab);
-    free(p);
+    free(p);*/
+
     return SQLITE_OK;
 }
 
@@ -87,6 +93,8 @@ static int mecabOpen(
     int nInput,                         /* Length of pInput in bytes */
     sqlite3_tokenizer_cursor **ppCursor /* OUT: Tokenization cursor */
 ) {
+
+    /*
     MecabTokenizer *p = (MecabTokenizer *)pTokenizer;
     MecabCursor *pCsr;
     mecab_node_t *node;
@@ -110,7 +118,8 @@ static int mecabOpen(
     pCsr->offset = 0;
     pCsr->pos = 0;
 
-    *ppCursor = (sqlite3_tokenizer_cursor *)pCsr;
+    *ppCursor = (sqlite3_tokenizer_cursor *)pCsr;*/
+
     return SQLITE_OK;
 }
 
@@ -119,9 +128,12 @@ static int mecabOpen(
  * by a call to mecabOpen(). 
  */
 static int mecabClose(sqlite3_tokenizer_cursor *pCursor){
+
+    /*
     MecabCursor *pCsr = (MecabCursor *)pCursor;
     free(pCsr->buf);
-    free(pCsr);
+    free(pCsr);*/
+
     return SQLITE_OK;
 }
 
@@ -136,6 +148,8 @@ static int mecabNext(
     int *piEndOffset,       /* OUT: Ending offset of token */
     int *piPosition         /* OUT: Position integer of token */
 ){
+
+    /*
     mecab_node_t *node;
     int nlen;
 
@@ -164,14 +178,15 @@ static int mecabNext(
       return SQLITE_DONE;
     }
     pCsr->node = node->next;
-    pCsr->offset += node->rlength;
+    pCsr->offset += node->rlength;*/
+
     return SQLITE_OK;
 }
 
 /*
  * The set of routines that implement the MeCab tokenizer
  */
-static const sqlite3_tokenizer_module mecabTokenizerModule = {
+static const sqlite3_tokenizer_module ictlasTokenizerModule = {
     0,                          /* iVersion */
     mecabCreate,                /* xCreate  */
     mecabDestroy,               /* xCreate  */
@@ -220,8 +235,8 @@ int sqlite3_extension_init (
     const sqlite3_api_routines *pApi  /* API methods */
 ) {
     SQLITE_EXTENSION_INIT2(pApi)
-	printf("YES! Load mecab module\n");
-    return registerTokenizer(db, "mecab", &mecabTokenizerModule);
+	printf("YES! Load ictclas module\n");
+    return registerTokenizer(db, "ictclas", &ictlasTokenizerModule);
 }
 
 #endif /* !defined(SQLITE_CORE) || defined(SQLITE_ENABLE_FTS3) */
