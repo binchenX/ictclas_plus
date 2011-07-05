@@ -1,19 +1,7 @@
 
-/*
- * vi:ts=4:tw=78:shiftwidth=4:expandtab
- * vim600:fdm=marker
+/* 
  *
- * main.cpp  -  This is an very simple command line interface to ICTCLAS, a
- * current state-of-the-art Chinese Word Segmenter/Tagger.
- *
- * The program accepts input from stdin and outputs tagged results to stdout
- * line by line.
- *
- * Usage: program < stdin > stdout
- *
- * Copyright (C) 2003 by Zhang Le <ejoy@users.sourceforge.net>
- * Begin       : 11-Jun-2003
- * Last Change : 25-Oct-2003.
+ * Copyright (C) 2011 by Pierr Chen pierr.chen@gmail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,6 +77,8 @@ IctclasCursor * ictclas_ParagraphProcessing(char *input)
     //is output zeor terminated??? 
 
     c->buflen = strlen(output);
+    c->offset = 0;
+    c->pos = 0;
 
     if(ret)
     {
@@ -99,6 +89,90 @@ IctclasCursor * ictclas_ParagraphProcessing(char *input)
     }
    
 
+
+}
+
+
+
+
+/**
+ *  
+ *  
+ * - - - - - - - - - - - - - - - - 
+ *             | _ _ _     |   
+ *  
+ *            offset
+ *  
+ * precondition : 
+ *  
+ *  
+ * postcondition :  
+ *  
+ * - - - - - - - - - - - - - - - - 
+ *             |            |
+ *                       offset
+ *  
+ *  
+ * 
+ * @author root (7/6/2011)
+ * 
+ * @param pCursor 
+ * @param ppToken 
+ * @param pnBytes 
+ * @param piStartOffset 
+ * @param piEndOffset 
+ * @param piPosition 
+ * 
+ * @return int RETURN CURSOR_DONE WHEN return the end of the 
+ *         buffer
+ *             RETURN CURSOR_OK when return next Token
+ *             successfully 
+ */
+int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
+    const char **ppToken, int *pnBytes,  /* OUT: Normalized text for token */
+    int *piStartOffset,  /* OUT: Byte offset of token in input buffer */
+    int *piEndOffset,    /* OUT: Byte offset of end of token in input buffer */
+    int *piPosition      /* OUT: Number of tokens returned before this one */
+)
+{
+
+    char *buf = pCursor->buf;
+    char *pCur = pCursor->buf + pCursor->offset;
+    *ppToken = pCur;
+
+    int node_length = 0;
+
+
+    //find the end for next token
+    while ( *pCur != '\0' && *pCur++ != 0x20 )
+    {
+        node_length++;
+    }
+
+    if(*pCur == '\0')
+    {
+        return ICT_CURSOR_DONE;
+    }
+    
+    *pnBytes = node_length;
+
+    //Every token introduce a space ,which takes 2 bytes in GB encoding , 
+    //we have to sub those spaces when return piStartOffset
+    *piStartOffset = pCursor->offset - (2 * pCursor->pos);
+    *piEndOffset = *piStartOffset + node_length;
+
+    //advance the pCurr 2 more bytes to point to next Token
+
+    pCur += 2;
+    //offset point to the begining of next Token 
+    pCursor->offset = pCur - pCursor->buf;
+
+    pCursor->pos += 1;
+
+    return ICT_CURSOR_OK;
+
+
+    
 
 }
 

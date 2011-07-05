@@ -69,6 +69,27 @@ int main(int argc, char* argv[]) {
   );
 #endif
        //everytime move to next space 
+       //print out the token one by one
+
+        const char * pToken = NULL;
+        int nBytes = 0 ;
+        int iStartOffset = 0 ;
+        int iendOffset = 0;
+        int iPosition = 0;
+
+        while(ICT_CURSOR_OK == ictclas_nextToken(c,&pToken,&nBytes,&iStartOffset,&iendOffset,&iPosition))
+        {
+
+            char tempToken[1000];
+
+            //make sure tempToken is zero ended 
+            memset(tempToken,0,1000);
+
+            memcpy(tempToken,pToken,nBytes);
+
+            printf("%d %s (%d,%d)\n" , iPosition, tempToken , iStartOffset,iendOffset );
+
+        }
 
       
 
