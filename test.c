@@ -28,14 +28,7 @@
  * License along with this program.
  */
 
-/*
-#include <cstdlib>
-#include <cassert>
-#include <stdexcept> //for std::runtime_error
-#include <memory>    //for std::bad_alloc
-#include <iostream>
-#include <string>
-#include <fstream>*/
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -45,20 +38,6 @@
 #endif
 
 
-/*
-char * get_exe_path()
-{
-    static char buf[PATH_MAX];
-    int rslt=readlink("/proc/self/exe",buf,PATH_MAX);
-    if (rslt<0||rslt>=PATH_MAX) return NULL;
-    while (buf[--rslt]!='/') { buf[rslt]='\0'; }
-    return buf;
-}
-*/
-
-
-
-//#include "Source/Result.h"
 #include "Source/CWrapper.h"
 
 int main(int argc, char* argv[]) {
@@ -75,7 +54,23 @@ int main(int argc, char* argv[]) {
         printf("Retrieved line of length %zu :\n", n);
         printf("%s", line);
 
-        char *output =  ictclas_ParagraphProcessing(line);
+        IctclasCursor *c = ictclas_ParagraphProcessing(line);
+
+        printf("parsed data %d : %s \n" , c->buflen, c->buf);
+
+        //should be able to iterate the Cursor
+#if 0 
+         int (*xNext)(
+    sqlite3_tokenizer_cursor *pCursor,   /* Tokenizer cursor */
+    const char **ppToken, int *pnBytes,  /* OUT: Normalized text for token */
+    int *piStartOffset,  /* OUT: Byte offset of token in input buffer */
+    int *piEndOffset,    /* OUT: Byte offset of end of token in input buffer */
+    int *piPosition      /* OUT: Number of tokens returned before this one */
+  );
+#endif
+       //everytime move to next space 
+
+      
 
         if (output != NULL)
         {

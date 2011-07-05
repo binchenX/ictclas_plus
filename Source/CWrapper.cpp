@@ -37,6 +37,7 @@
 #include <string>
 #include <fstream>
 #include <unistd.h>
+#include <string.h>
 
 #include "CWrapper.h"
 
@@ -71,19 +72,28 @@ using namespace std;
  */
 
 
-char * ictclas_ParagraphProcessing(char *input)
+IctclasCursor * ictclas_ParagraphProcessing(char *input)
 {
 
-     char *output = (char*)malloc(1000); 
+    IctclasCursor *c = (IctclasCursor*) malloc(sizeof(*c));
+
+    char *output = (char*)malloc(1000); 
+    c->buf = output;
     CResult  result(get_exe_path()); // the argument is the directory where "Data" is located.  It should be ended with a "/"
 
     //the result will be space delimited ,no type 
     result.m_nOperateType = 0;
 
     bool ret = result.ParagraphProcessing(input, output);
+
+    //is output zeor terminated??? 
+
+    c->buflen = strlen(output);
+
     if(ret)
     {
-        return output;
+        return c;
+
     } else {
         return NULL;
     }
