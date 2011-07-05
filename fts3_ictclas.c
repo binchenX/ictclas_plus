@@ -14,6 +14,8 @@ extern "C" {
 #include "sqlite3ext.h"
 #include "fts3_tokenizer.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 //for ictclas 
 #include "CWrapper.h"
 
@@ -24,59 +26,49 @@ extern "C" {
 
 SQLITE_EXTENSION_INIT1
 
-/*
 typedef struct MecabTokenizer {
     sqlite3_tokenizer base;
-    mecab_t *mecab;
-} MecabTokenizer;
+    //mecab_t *mecab;
+} IctlasTokenizer;
 
 typedef struct MecabCursor {
     sqlite3_tokenizer_cursor base;
-    mecab_node_t *node;
-    char *buf;
-    int buflen;
-    int offset;
-    int pos;
-} MecabCursor;
-*/
+    IctclasCursor *c;
+} IctlasCursorAdapter;
+
 
 
 /*
  * Create a new tokenizer instance.
  */
-static int mecabCreate(
+static int ictclasCreate(
     int argc,                       /* Number of entries in argv[] */
     const char * const *argv,       /* Tokenizer creation arguments */
     sqlite3_tokenizer **ppTokenizer /* OUT: Created tokenizer */
 ){
 
-    /*
-    MecabTokenizer *p;
-    mecab_t *mecab;
-    p = (MecabTokenizer*) malloc(sizeof(MecabTokenizer));
+    
+    IctlasTokenizer *p;
+   
+    p = (IctlasTokenizer*) malloc(sizeof(IctlasTokenizer));
     if(p == NULL) {
         return SQLITE_NOMEM;
     }
-    memset(p, 0, sizeof(MecabTokenizer));
-    
-    p->mecab = mecab_new(argc, (char**)argv);
-    if (p->mecab == NULL) {
-        return SQLITE_ERROR; 
-    }
-
+    memset(p, 0, sizeof(IctlasTokenizer));
+   
     *ppTokenizer = (sqlite3_tokenizer *)p;
-*/
+
     return SQLITE_OK;
 }
 
 /* 
  * Destroy a tokenizer
  */
-static int mecabDestroy(sqlite3_tokenizer *pTokenizer){
-    /*
-    MecabTokenizer *p = (MecabTokenizer *)pTokenizer;
-    mecab_destroy(p->mecab);
-    free(p);*/
+static int ictclasDestroy(sqlite3_tokenizer *pTokenizer){
+    
+    IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
+    //mecab_destroy(p->mecab);
+    free(p);
 
     return SQLITE_OK;
 }
@@ -87,38 +79,30 @@ static int mecabDestroy(sqlite3_tokenizer *pTokenizer){
  * used to incrementally tokenize this string is returned in 
  * *ppCursor.
  */
-static int mecabOpen(
+static int ictclasOpen(
     sqlite3_tokenizer *pTokenizer,      /* The tokenizer */
     const char *pInput,                 /* Input string */
     int nInput,                         /* Length of pInput in bytes */
     sqlite3_tokenizer_cursor **ppCursor /* OUT: Tokenization cursor */
 ) {
 
-    /*
-    MecabTokenizer *p = (MecabTokenizer *)pTokenizer;
-    MecabCursor *pCsr;
-    mecab_node_t *node;
+    
+    IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
+    IctlasCursorAdapter *pCsr;
+    
 
     *ppCursor = 0;
 
-    pCsr = (MecabCursor *)malloc( sizeof(MecabCursor));
+    pCsr = (IctlasCursorAdapter *)malloc( sizeof(IctlasCursorAdapter));
+
     if(pCsr == NULL){
         return SQLITE_NOMEM;
     }
-    memset(pCsr, 0, sizeof(MecabCursor));
+    memset(pCsr, 0, sizeof(IctlasCursorAdapter));
 
-    node = mecab_sparse_tonode2(p->mecab, pInput, strlen(pInput)+1);
-    if (node == NULL) {
-        return SQLITE_ERROR;
-    }
-#define DEFAULT_CURSOR_BUF 256
-    pCsr->node = node;
-    pCsr->buf = malloc(DEFAULT_CURSOR_BUF);
-    pCsr->buflen = DEFAULT_CURSOR_BUF;
-    pCsr->offset = 0;
-    pCsr->pos = 0;
+    pCsr->c = ictclas_ParagraphProcessing((char *)pInput);
 
-    *ppCursor = (sqlite3_tokenizer_cursor *)pCsr;*/
+    *ppCursor = (sqlite3_tokenizer_cursor *)pCsr;
 
     return SQLITE_OK;
 }
@@ -127,20 +111,20 @@ static int mecabOpen(
  * Close a tokenization cursor previously opened 
  * by a call to mecabOpen(). 
  */
-static int mecabClose(sqlite3_tokenizer_cursor *pCursor){
+static int ictclasClose(sqlite3_tokenizer_cursor *pCursor){
 
     /*
-    MecabCursor *pCsr = (MecabCursor *)pCursor;
+    IctlasCursorAdapter *pCsr = (IctlasCursorAdapter *)pCursor;
     free(pCsr->buf);
-    free(pCsr);*/
-
+    free(pCsr);
+   */
     return SQLITE_OK;
 }
 
 /*
  * Extract the next token from a tokenization cursor.
  */
-static int mecabNext(
+static int ictclasNext(
     sqlite3_tokenizer_cursor *pCursor,/* Cursor returned by mecabOpen */
     const char **ppToken,   /* OUT: *ppToken is the token text */
     int *pnBytes,           /* OUT: Number of bytes in token */
@@ -149,36 +133,16 @@ static int mecabNext(
     int *piPosition         /* OUT: Position integer of token */
 ){
 
-    /*
-    mecab_node_t *node;
-    int nlen;
+   
+    IctlasCursorAdapter *pCsr = (IctlasCursorAdapter *)pCursor;
 
-    MecabCursor *pCsr = (MecabCursor *)pCursor;
-    node = pCsr->node;
-    while (node->next != NULL && node->length == 0) {
-        node = node->next;
-    }
-    
-    nlen = node->length;
-    if (node->length > pCsr->buflen) {
-        char *buf = realloc(pCsr->buf, node->length + 1);
-        pCsr->buf = buf;
-        pCsr->buflen = node->length;
-    }
-    strncpy(pCsr->buf, node->surface, node->length);
-    pCsr->buf[node->length] = '\0';
+    int ret = ictclas_nextToken(pCsr->c,ppToken,pnBytes,piStartOffset,piEndOffset,piPosition);
 
-    *ppToken = pCsr->buf;
-    *pnBytes = node->length;
-    *piStartOffset = pCsr->offset;
-    *piEndOffset = pCsr->offset + node->length;
-    *piPosition = pCsr->pos++;
-
-    if (node->next == NULL) {
-      return SQLITE_DONE;
-    }
-    pCsr->node = node->next;
-    pCsr->offset += node->rlength;*/
+    if( ret == ICT_CURSOR_DONE) {
+        return SQLITE_DONE;
+    } else if( ret == ICT_CUROSR_ERROR ) {
+        return SQLITE_ERROR;
+    } 
 
     return SQLITE_OK;
 }
@@ -188,11 +152,11 @@ static int mecabNext(
  */
 static const sqlite3_tokenizer_module ictlasTokenizerModule = {
     0,                          /* iVersion */
-    mecabCreate,                /* xCreate  */
-    mecabDestroy,               /* xCreate  */
-    mecabOpen,                  /* xOpen    */
-    mecabClose,                 /* xClose   */
-    mecabNext,                  /* xNext    */
+    ictclasCreate,                /* xCreate  */
+    ictclasDestroy,               /* xCreate  */
+    ictclasOpen,                  /* xOpen    */
+    ictclasClose,                 /* xClose   */
+    ictclasNext,                  /* xNext    */
 };
 
 

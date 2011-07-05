@@ -60,7 +60,7 @@ using namespace std;
  */
 
 
-IctclasCursor * ictclas_ParagraphProcessing(char *input)
+IctclasCursor * ictclas_ParagraphProcessing( char *input)
 {
 
     IctclasCursor *c = (IctclasCursor*) malloc(sizeof(*c));
