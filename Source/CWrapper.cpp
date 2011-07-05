@@ -160,15 +160,16 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
     //we have to sub those spaces when return piStartOffset
     *piStartOffset = pCursor->offset - (2 * pCursor->pos);
     *piEndOffset = *piStartOffset + node_length;
+    *piPosition = pCursor->pos + 1;
+
+    pCursor->pos += 1;
 
     //advance the pCurr 2 more bytes to point to next Token
 
     pCur += 2;
     //offset point to the begining of next Token 
     pCursor->offset = pCur - pCursor->buf;
-
-    pCursor->pos += 1;
-
+   
     return ICT_CURSOR_OK;
 
 

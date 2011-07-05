@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 
             memcpy(tempToken,pToken,nBytes);
 
-            printf("%d %s (%d,%d)\n" , iPosition, tempToken , iStartOffset,iendOffset );
+            printf("%d %s(%d) (%d,%d)\n" , iPosition, tempToken , nBytes , iStartOffset,iendOffset );
 
         }
 
