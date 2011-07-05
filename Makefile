@@ -1,7 +1,7 @@
 
 #build the test
 all: test.c Source/ictclas.a
-	gcc -o ictclas test.c Source/ictclas.a
+	g++ -o ictclas test.c Source/ictclas.a
 	ictclas < chinese.raw.txt > chinese.seg.txt
 
 

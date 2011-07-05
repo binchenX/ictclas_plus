@@ -66,9 +66,9 @@ int main(int argc, char* argv[]) {
 
     char output[1024*100];
     char *line;
-    int len = 0;
+    size_t len = 0;
     FILE *fp = stdin;
-    ssize_t n;
+    int n;
 
     while ((n = getline(&line, &len, fp)) != -1)
     {
