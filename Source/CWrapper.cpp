@@ -126,7 +126,9 @@ IctclasCursor * ictclas_ParagraphProcessing(char *input)
  * @return int RETURN CURSOR_DONE WHEN return the end of the 
  *         buffer
  *             RETURN CURSOR_OK when return next Token
- *             successfully 
+ *             successfully
+ *  
+ * 
  */
 int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
     const char **ppToken, int *pnBytes,  /* OUT: Normalized text for token */
@@ -143,7 +145,7 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
     int node_length = 0;
 
 
-    //find consective 0x2020
+    //
 
     while ( *pCur != '\0' && *pCur++ != 0x20 )
     {
@@ -156,7 +158,11 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
         return ICT_CURSOR_DONE;
     }
 
-    
+    //now pCur is pointing to the 2nd 0x20
+    //advance the pCurr 1 more bytes to point to begining of next Token
+    //TODO:what if the begining is a space as well??
+    pCur += 1;
+
     *pnBytes = node_length;
 
     //Every token introduce a space ,which takes 2 bytes in GB encoding , 
@@ -167,9 +173,7 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
 
     pCursor->pos += 1;
 
-    //advance the pCurr 2 more bytes to point to next Token
-
-    pCur += 1;
+   
     //offset point to the begining of next Token 
     pCursor->offset = pCur - pCursor->buf;
    
