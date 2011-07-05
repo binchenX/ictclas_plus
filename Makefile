@@ -1,9 +1,11 @@
-#chinese.seg.txt: chinese.raw.txt ictclas
-#	ictclas < chinese.raw.txt > chinese.seg.txt
 
-all: main.cpp Source/ictclas.a
-	g++ -o ictclas main.cpp Source/ictclas.a
+#build the test
+all: test.c Source/ictclas.a
+	gcc -o ictclas test.c Source/ictclas.a
+	ictclas < chinese.raw.txt > chinese.seg.txt
 
+
+#build the library
 Source/ictclas.a: Source/*.cpp
 	cd Source; g++ -c *.cpp
 	cd Source; ar -r ictclas.a *.o
