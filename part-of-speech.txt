@@ -1,0 +1,39 @@
+Ag 	adjective morpheme
+a 	adjective
+ad 	adverbial adjective
+an 	nominal adjective
+b 	discriminative
+c 	conjunctive
+Dg 	adverbial morpheme
+d 	adverb
+e 	exclamation
+f 	direction
+g 	morpheme
+h 	prefix
+i 	four-character idiom
+j 	abbreviation
+k 	suffix
+l 	idiom
+m 	numeral
+Ng 	nominal morpheme
+c	  common noun
+nr 	person name
+ns 	place name
+nt 	organization name
+nz 	other proper name
+o 	onomatopoeia
+p 	preposition
+q 	quantifier
+r 	pronoun
+s 	locational noun
+Tg 	temporal morpheme
+t	  temporal noun
+u 	auxiliary word
+Vg 	verbal morpheme
+v 	verb
+vd 	adverbial verb
+vn 	nominal verb
+w 	punctuation
+x 	non-morpheme character
+y 	model word
+z 	status adjective

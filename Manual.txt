@@ -1,0 +1,28 @@
+
+The installation and use of ICTCLAS is simple.
+
+Please download the software package and extract all the files in a directory.  
+All the source codes are in the Source directory and all the data are in the 
+Data directory.  
+
+The file main.cpp in the installation directory give a sample to show how to
+use ICTCLAS to do Chinese word segmentation and part-of-speech tagging.
+Firstly, you need to include the "Source/Result.h".
+Then you should declare a object of CResult class.
+The construction of CResult class object will initialize for ICTCLAS,
+while the destruction will delete the ICTCLAS from memory.
+The construction of CResult will take a parameter which indicate the directory
+where the Data directory is located.
+The ParagraphProcessing() member function of CResult class take the first
+parameter as the input string and the second parameter as the output string.
+
+For samples of input text and output text for ICTCLAS, please check the file
+chinese.raw.txt and chinese.seg.txt.
+
+Both the input text and output text are in GB code.
+No other code are supported in this version of ICTCLAS.
+
+Type 'make' in the installation, an executable file ictclas will be generated
+by the main.cpp file, which takes the stdin as input and stdout as output.
+So if you want test the generated exectuable file, just type:
+    ictclas < chinese.raw.txt
