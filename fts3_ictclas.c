@@ -4,10 +4,10 @@
 
 #if !defined(SQLITE_CORE) || defined(SQLITE_ENABLE_FTS3)
 
-#include <assert.h>
-#include <string.h>
+    #include <assert.h>
+    #include <string.h>
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -21,17 +21,19 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
+    #endif
 
 
 SQLITE_EXTENSION_INIT1
 
-typedef struct MecabTokenizer {
+typedef struct MecabTokenizer
+{
     sqlite3_tokenizer base;
     //mecab_t *mecab;
 } IctlasTokenizer;
 
-typedef struct MecabCursor {
+typedef struct MecabCursor
+{
     sqlite3_tokenizer_cursor base;
     IctclasCursor *c;
 } IctlasCursorAdapter;
@@ -42,21 +44,22 @@ typedef struct MecabCursor {
  * Create a new tokenizer instance.
  */
 static int ictclasCreate(
-    int argc,                       /* Number of entries in argv[] */
-    const char * const *argv,       /* Tokenizer creation arguments */
-    sqlite3_tokenizer **ppTokenizer /* OUT: Created tokenizer */
-){
+                        int argc,                       /* Number of entries in argv[] */
+                        const char * const *argv,       /* Tokenizer creation arguments */
+                        sqlite3_tokenizer **ppTokenizer /* OUT: Created tokenizer */
+                        ){
 
     printf("trace %s\n" ,__FUNCTION__);
-    
+
     IctlasTokenizer *p;
-   
+
     p = (IctlasTokenizer*) malloc(sizeof(IctlasTokenizer));
-    if(p == NULL) {
+    if (p == NULL)
+    {
         return SQLITE_NOMEM;
     }
     memset(p, 0, sizeof(IctlasTokenizer));
-   
+
     *ppTokenizer = (sqlite3_tokenizer *)p;
 
     return SQLITE_OK;
@@ -66,9 +69,9 @@ static int ictclasCreate(
  * Destroy a tokenizer
  */
 static int ictclasDestroy(sqlite3_tokenizer *pTokenizer){
-    
+
     IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
-     printf("trace %s\n" ,__FUNCTION__);
+    printf("trace %s\n" ,__FUNCTION__);
     //mecab_destroy(p->mecab);
     free(p);
 
@@ -82,24 +85,25 @@ static int ictclasDestroy(sqlite3_tokenizer *pTokenizer){
  * *ppCursor.
  */
 static int ictclasOpen(
-    sqlite3_tokenizer *pTokenizer,      /* The tokenizer */
-    const char *pInput,                 /* Input string */
-    int nInput,                         /* Length of pInput in bytes */
-    sqlite3_tokenizer_cursor **ppCursor /* OUT: Tokenization cursor */
-) {
+                      sqlite3_tokenizer *pTokenizer,      /* The tokenizer */
+                      const char *pInput,                 /* Input string */
+                      int nInput,                         /* Length of pInput in bytes */
+                      sqlite3_tokenizer_cursor **ppCursor /* OUT: Tokenization cursor */
+                      ) {
 
-    
+
     IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
     IctlasCursorAdapter *pCsr;
 
-     printf("trace %s\n" ,__FUNCTION__);
-    
+    printf("trace %s\n" ,__FUNCTION__);
+
 
     *ppCursor = 0;
 
     pCsr = (IctlasCursorAdapter *)malloc( sizeof(IctlasCursorAdapter));
 
-    if(pCsr == NULL){
+    if (pCsr == NULL)
+    {
         return SQLITE_NOMEM;
     }
     memset(pCsr, 0, sizeof(IctlasCursorAdapter));
@@ -123,7 +127,7 @@ static int ictclasClose(sqlite3_tokenizer_cursor *pCursor){
     free(pCsr);
    */
 
-     printf("trace %s\n" ,__FUNCTION__);
+    printf("trace %s\n" ,__FUNCTION__);
     return SQLITE_OK;
 }
 
@@ -131,16 +135,16 @@ static int ictclasClose(sqlite3_tokenizer_cursor *pCursor){
  * Extract the next token from a tokenization cursor.
  */
 static int ictclasNext(
-    sqlite3_tokenizer_cursor *pCursor,/* Cursor returned by mecabOpen */
-    const char **ppToken,   /* OUT: *ppToken is the token text */
-    int *pnBytes,           /* OUT: Number of bytes in token */
-    int *piStartOffset,     /* OUT: Starting offset of token */
-    int *piEndOffset,       /* OUT: Ending offset of token */
-    int *piPosition         /* OUT: Position integer of token */
-){
+                      sqlite3_tokenizer_cursor *pCursor,/* Cursor returned by mecabOpen */
+                      const char **ppToken,   /* OUT: *ppToken is the token text */
+                      int *pnBytes,           /* OUT: Number of bytes in token */
+                      int *piStartOffset,     /* OUT: Starting offset of token */
+                      int *piEndOffset,       /* OUT: Ending offset of token */
+                      int *piPosition         /* OUT: Position integer of token */
+                      ){
 
-     printf("trace %s\n" ,__FUNCTION__);
-   
+    printf("trace %s\n" ,__FUNCTION__);
+
     IctlasCursorAdapter *pCsr = (IctlasCursorAdapter *)pCursor;
 
     int ret = ictclas_nextToken(pCsr->c,ppToken,pnBytes,piStartOffset,piEndOffset,piPosition);
@@ -150,24 +154,28 @@ static int ictclasNext(
         char tmp[200];
         memset(tmp, 0, 200);
 
-        if(*pnBytes != 0 ) {
+        if (*pnBytes != 0 )
+        {
 
             memcpy(tmp,*ppToken,*pnBytes);
-       
-          printf("%d %d %s\n" ,*piPosition,*pnBytes ,*ppToken);
-        } else {
+
+            printf("%d %d %s\n" ,*piPosition,*pnBytes ,tmp);
+        } else
+        {
 
             //once *pnBytes == 0, iteration over ictclasNext will be terminated 
             printf("error: token bytes is 0" );
         }
-        
+
 
     }
-    if( ret == ICT_CURSOR_DONE) {
+    if ( ret == ICT_CURSOR_DONE)
+    {
         return SQLITE_DONE;
-    } else if( ret == ICT_CUROSR_ERROR ) {
+    } else if ( ret == ICT_CUROSR_ERROR )
+    {
         return SQLITE_ERROR;
-    } 
+    }
 
     return SQLITE_OK;
 }
@@ -186,17 +194,18 @@ static const sqlite3_tokenizer_module ictlasTokenizerModule = {
 
 
 static int registerTokenizer(
-    sqlite3 *db, 
-    char *zName, 
-    const sqlite3_tokenizer_module *p
-){
+                            sqlite3 *db, 
+                            char *zName, 
+                            const sqlite3_tokenizer_module *p
+                            ){
     int rc;
     sqlite3_stmt *pStmt;
     const char zSql[] = "SELECT fts3_tokenizer(?, ?)";
-    
+
     rc = sqlite3_prepare_v2 (db, zSql, -1, &pStmt, 0);
 
-    if( rc!=SQLITE_OK ){
+    if ( rc!=SQLITE_OK )
+    {
         return rc;
     }
 
@@ -210,21 +219,21 @@ static int registerTokenizer(
 /*
  * entry point
  */
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C" int sqlite3_extension_init (
-    sqlite3 *db,          /* The database connection */
-    char **pzErrMsg,      /* Write error messages here */
-    const sqlite3_api_routines *pApi  /* API methods */
-	);
-#endif
+                                      sqlite3 *db,          /* The database connection */
+                                      char **pzErrMsg,      /* Write error messages here */
+                                      const sqlite3_api_routines *pApi  /* API methods */
+                                      );
+    #endif
 
 int sqlite3_extension_init (
-    sqlite3 *db,          /* The database connection */
-    char **pzErrMsg,      /* Write error messages here */
-    const sqlite3_api_routines *pApi  /* API methods */
-) {
+                           sqlite3 *db,          /* The database connection */
+                           char **pzErrMsg,      /* Write error messages here */
+                           const sqlite3_api_routines *pApi  /* API methods */
+                           ) {
     SQLITE_EXTENSION_INIT2(pApi)
-	printf("YES! Load ictclas module\n");
+    printf("YES! Load ictclas module\n");
     return registerTokenizer(db, "ictclas", &ictlasTokenizerModule);
 }
 
