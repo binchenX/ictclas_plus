@@ -52,20 +52,22 @@ char * get_exe_path()
 using namespace std;
 
 
-/**
- * This is the entry point of C program 
- *  
- * parse the input and return the parsed output
- *  
+
+
+/** 
+ * 
+ * 
+ * @param input should be NULL terminated 
+ * 
+ * @return IctclasCursor* user should free the memory
  */
-
-
 IctclasCursor * ictclas_ParagraphProcessing( char *input)
 {
 
     IctclasCursor *c = (IctclasCursor*) malloc(sizeof(*c));
 
-    char *output = (char*)malloc(1000); 
+    const int FACTOR = 6;
+    char *output = (char*)malloc(strlen(input)*FACTOR); 
     c->buf = output;
     CResult  result(get_exe_path()); // the argument is the directory where "Data" is located.  It should be ended with a "/"
 

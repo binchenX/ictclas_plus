@@ -26,13 +26,12 @@ extern "C" {
 
 SQLITE_EXTENSION_INIT1
 
-typedef struct MecabTokenizer
+typedef struct tagIctlasTokenizer
 {
     sqlite3_tokenizer base;
-    //mecab_t *mecab;
 } IctlasTokenizer;
 
-typedef struct MecabCursor
+typedef struct tagIctlasCursorAdapter
 {
     sqlite3_tokenizer_cursor base;
     IctclasCursor *c;
@@ -41,7 +40,9 @@ typedef struct MecabCursor
 
 
 /*
- * Create a new tokenizer instance.
+ *  
+ * Create a new tokenizer instance. 
+ *  
  */
 static int ictclasCreate(
                         int argc,                       /* Number of entries in argv[] */
@@ -72,7 +73,6 @@ static int ictclasDestroy(sqlite3_tokenizer *pTokenizer){
 
     IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
     printf("trace %s\n" ,__FUNCTION__);
-    //mecab_destroy(p->mecab);
     free(p);
 
     return SQLITE_OK;
@@ -106,6 +106,7 @@ static int ictclasOpen(
     {
         return SQLITE_NOMEM;
     }
+
     memset(pCsr, 0, sizeof(IctlasCursorAdapter));
 
     pCsr->c = ictclas_ParagraphProcessing((char *)pInput);
@@ -121,13 +122,12 @@ static int ictclasOpen(
  */
 static int ictclasClose(sqlite3_tokenizer_cursor *pCursor){
 
-    /*
-    IctlasCursorAdapter *pCsr = (IctlasCursorAdapter *)pCursor;
-    free(pCsr->buf);
-    free(pCsr);
-   */
-
+    
+    IctlasCursorAdapter *pAdapter = (IctlasCursorAdapter *)pCursor;
     printf("trace %s\n" ,__FUNCTION__);
+    free(pAdapter->c->buf);
+    free(pAdapter->c);
+    free(pAdapter);
     return SQLITE_OK;
 }
 
