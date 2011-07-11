@@ -5,6 +5,9 @@ all: test_ictclas.c sharedlib
 	#ictclas < chinese.raw.txt > chinese.seg.txt
 
 
+fts:
+	g++ -o test_fts -I/usr/local/include  test_ftsict.c -L /usr/lib -lsqlite3 -lpthread -ldl
+
 lib: fts3_ictclas.c sharedlib 
 	g++ -fPIC -I/usr/local/include -I./Source -c fts3_ictclas.c
 	g++ -shared -o libftsict.so fts3_ictclas.o -L./Source -lictclas
