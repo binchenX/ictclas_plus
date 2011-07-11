@@ -159,7 +159,8 @@ static int ictclasNext(
 
             memcpy(tmp,*ppToken,*pnBytes);
 
-            printf("%d %d %s\n" ,*piPosition,*pnBytes ,tmp);
+            printf("%d %d %s(%d) (%d,%d)\n" ,ret , *piPosition,tmp,*pnBytes , *piStartOffset,*piEndOffset);
+
         } else
         {
 
@@ -169,6 +170,7 @@ static int ictclasNext(
 
 
     }
+
     if ( ret == ICT_CURSOR_DONE)
     {
         return SQLITE_DONE;

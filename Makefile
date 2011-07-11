@@ -10,7 +10,7 @@ fts: lib
 
 lib: fts3_ictclas.c sharedlib 
 	g++ -fPIC -I/usr/local/include -I./Source -c fts3_ictclas.c
-	g++ -shared -o libftsict.so fts3_ictclas.o -L./Source -lictclas
+	g++ -shared -o libftsict.so fts3_ictclas.o -L./ -lictclas
 
 #build the library
 sharedlib: Source/*.cpp

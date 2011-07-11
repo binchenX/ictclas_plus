@@ -39,7 +39,7 @@ int insert_one_row(const char * line ,int len)
         DB_ASSERT(!"did not call init_db() OR sql did not match table format OR bad sql");
     }
 
-    rc = sqlite3_bind_text(sql_stmt,1, line, 40 ,SQLITE_TRANSIENT);
+    rc = sqlite3_bind_text(sql_stmt,1, line, len ,SQLITE_TRANSIENT);
 
     if (rc != SQLITE_OK)
     {
