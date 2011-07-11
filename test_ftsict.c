@@ -18,7 +18,7 @@
  */
 
 //gloable variables	
-sqlite3 * _dbHandle;
+sqlite3 * _dbHandle = NULL;
 
 #define DB_ASSERT(x) assert(x)
 
@@ -28,16 +28,22 @@ int insert_one_row(const char * line ,int len)
 int rc;
 sqlite3_stmt *sql_stmt;
 char *sql;
-sql = (char *)"INSERT INTO p2 VALUES('\u65b0\u534e\u7f51\u534e\u76db\u987f2\u670814\u65e5\u7535')";
+//sql = (char *)"INSERT INTO p2 VALUES('\u65b0\u534e\u7f51\u534e\u76db\u987f2\u670814\u65e5\u7535')";
+sql = (char *)"INSERT INTO p2 VALUES (?)";
+
 rc = sqlite3_prepare_v2(_dbHandle,sql,-1,&sql_stmt,NULL);
-if (rc != SQLITE_OK) DB_ASSERT(!"did not call init_db() OR sql did not match table format OR bad sql");
- 
-/* 
-rc = sqlite3_bind_text(sql_stmt,1, line, len ,SQLITE_TRANSIENT);
+
+if (rc != SQLITE_OK) {
+    printf("Error when prepare :%s\n",sqlite3_errmsg(_dbHandle));
+    DB_ASSERT(!"did not call init_db() OR sql did not match table format OR bad sql");
+}
+
+rc = sqlite3_bind_text(sql_stmt,1, line, 40 ,SQLITE_TRANSIENT);
 
 if(rc != SQLITE_OK) {
     printf("Error when bin :%s\n",sqlite3_errmsg(_dbHandle));
-}*/
+}
+
 rc = sqlite3_step(sql_stmt);
 
 if(rc != SQLITE_DONE) {
@@ -104,25 +110,27 @@ int main()
 
     sqlite3_enable_load_extension(_dbHandle,1);
 
-
     if(rc != SQLITE_OK){printf("Error :%s\n",sqlite3_errmsg(_dbHandle));}
 
     rc = sqlite3_exec(_dbHandle,"SELECT load_extension('./libftsict.so')", NULL, 0, NULL);
     if(rc != SQLITE_OK){printf("Error when loading extension :%s\n",sqlite3_errmsg(_dbHandle));}
 
-   // sqlite3_exec(_dbHandle, "CREATE TABLE IF NOT EXISTS android_metadata(locale TEXT DEFAULT 'en_US')",NULL,0,NULL);
-   // sqlite3_exec(_dbHandle, "INSERT INTO android_metadata VALUES('en_US')" ,NULL,0,NULL);
     const char *sql_create_tblSection = "CREATE VIRTUAL TABLE p2 USING fts3(t, tokenize=ictclas)";
+    //const char *sql_create_tblSection = "CREATE VIRTUAL TABLE p2 USING fts3(t)";
     rc = sqlite3_exec(_dbHandle,sql_create_tblSection,NULL,0,NULL);
     if(rc != SQLITE_OK){printf("Error :%s\n",sqlite3_errmsg(_dbHandle));}
 
     char line[1000];
 
+    memset(line, 0, 1000);
+
     int len = 0 ;
 
     get_oneline(line,&len);
 
-    memcpy(line,"hello world",8);
+    printf("get line %s \n" ,line);
+
+    //memcpy(line,"hello world",8);
 
     insert_one_row(line , len);
 

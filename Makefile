@@ -5,7 +5,7 @@ all: test_ictclas.c sharedlib
 	#ictclas < chinese.raw.txt > chinese.seg.txt
 
 
-fts:
+fts: lib
 	g++ -o test_fts -I/usr/local/include  test_ftsict.c -L/usr/lib/trident/ -lsqlite3 -lpthread -ldl
 
 lib: fts3_ictclas.c sharedlib 

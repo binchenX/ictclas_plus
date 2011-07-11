@@ -47,6 +47,7 @@ static int ictclasCreate(
     sqlite3_tokenizer **ppTokenizer /* OUT: Created tokenizer */
 ){
 
+    printf("trace %s\n" ,__FUNCTION__);
     
     IctlasTokenizer *p;
    
@@ -67,6 +68,7 @@ static int ictclasCreate(
 static int ictclasDestroy(sqlite3_tokenizer *pTokenizer){
     
     IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
+     printf("trace %s\n" ,__FUNCTION__);
     //mecab_destroy(p->mecab);
     free(p);
 
@@ -89,6 +91,8 @@ static int ictclasOpen(
     
     IctlasTokenizer *p = (IctlasTokenizer *)pTokenizer;
     IctlasCursorAdapter *pCsr;
+
+     printf("trace %s\n" ,__FUNCTION__);
     
 
     *ppCursor = 0;
@@ -118,6 +122,8 @@ static int ictclasClose(sqlite3_tokenizer_cursor *pCursor){
     free(pCsr->buf);
     free(pCsr);
    */
+
+     printf("trace %s\n" ,__FUNCTION__);
     return SQLITE_OK;
 }
 
@@ -133,11 +139,30 @@ static int ictclasNext(
     int *piPosition         /* OUT: Position integer of token */
 ){
 
+     printf("trace %s\n" ,__FUNCTION__);
    
     IctlasCursorAdapter *pCsr = (IctlasCursorAdapter *)pCursor;
 
     int ret = ictclas_nextToken(pCsr->c,ppToken,pnBytes,piStartOffset,piEndOffset,piPosition);
 
+    {
+        //print out this token
+        char tmp[200];
+        memset(tmp, 0, 200);
+
+        if(*pnBytes != 0 ) {
+
+            memcpy(tmp,*ppToken,*pnBytes);
+       
+          printf("%d %d %s\n" ,*piPosition,*pnBytes ,*ppToken);
+        } else {
+
+            //once *pnBytes == 0, iteration over ictclasNext will be terminated 
+            printf("error: token bytes is 0" );
+        }
+        
+
+    }
     if( ret == ICT_CURSOR_DONE) {
         return SQLITE_DONE;
     } else if( ret == ICT_CUROSR_ERROR ) {
