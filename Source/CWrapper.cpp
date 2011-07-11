@@ -138,6 +138,8 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
 )
 {
 
+    
+
     char *buf = pCursor->buf;
     char *pCur = pCursor->buf + pCursor->offset;
     *ppToken = pCur;
@@ -147,8 +149,9 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
 
     //
 
-    while ( *pCur != '\0' && *pCur++ != 0x20 )
+    while ( *pCur != '\0' && *pCur != 0x20 )
     {
+        pCur++;
         node_length++;
     }
 
@@ -160,8 +163,19 @@ int ictclas_nextToken( IctclasCursor *pCursor,   /* Tokenizer cursor */
 
     //now pCur is pointing to the 2nd 0x20
     //advance the pCurr 1 more bytes to point to begining of next Token
-    //TODO:what if the begining is a space as well??
-    pCur += 1;
+ 
+    //skip all the while space,some are the result of parse ,while some are from the original
+    //input. some space takes 2 bytes, 0x20x020, some takes one byte ,0x20.
+    while(*pCur == 0x20)
+    {
+        pCur++;
+
+    }
+
+    
+
+    //OK now pCur point to the next token
+    assert(*pCur != 0x20);
 
     *pnBytes = node_length;
 

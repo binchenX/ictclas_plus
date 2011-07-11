@@ -105,7 +105,7 @@ void get_oneline(char *oBuff, int *oLen)
             printf("%x " , oBuff[i]);
         }
 
-        printf("\n" , oBuff[i] & 0x0f);
+        printf("\n" , (char)(oBuff[i] & 0x0f));
 
     }
 

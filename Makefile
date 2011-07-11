@@ -1,7 +1,7 @@
 
 #build the test
 all: test_ictclas.c sharedlib
-	g++ -o test_ictclas test_ictclas.c -L./Source/ -lictclas
+	g++ -o test_ictclas -g test_ictclas.c -L./ -lictclas
 	#ictclas < chinese.raw.txt > chinese.seg.txt
 
 
@@ -14,9 +14,8 @@ lib: fts3_ictclas.c sharedlib
 
 #build the library
 sharedlib: Source/*.cpp
-	cd Source; g++ -fPIC -c  *.cpp
-	cd Source; g++ -shared -o libictclas.so *.o
-	cp libictclas.so ../ -vf
+	cd Source; g++ -g -fPIC -c  *.cpp
+	cd Source; g++ -shared -o ../libictclas.so *.o
 	#cd Source; ar -r ictclas.a *.o
 
 clean:
