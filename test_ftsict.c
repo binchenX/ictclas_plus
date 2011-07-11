@@ -4,6 +4,7 @@
 #include "sqlite3.h"
 
 
+
 /*** 
  
  create virtual FTS table using ictclas as the tokenzier.
@@ -25,7 +26,13 @@ int main()
 
     rc = sqlite3_open(dbFile,&_dbHandle);
 
-    sqlite3_exec(_dbHandle,"SELECT load_extension('./libftsict.so')", NULL, 0, NULL);
+    sqlite3_enable_load_extension(_dbHandle,1);
+
+
+    if(rc != SQLITE_OK){printf("Error :%s\n",sqlite3_errmsg(_dbHandle));}
+
+    rc = sqlite3_exec(_dbHandle,"SELECT load_extension('./libftsict.so')", NULL, 0, NULL);
+    if(rc != SQLITE_OK){printf("Error when loading extension :%s\n",sqlite3_errmsg(_dbHandle));}
 
    // sqlite3_exec(_dbHandle, "CREATE TABLE IF NOT EXISTS android_metadata(locale TEXT DEFAULT 'en_US')",NULL,0,NULL);
    // sqlite3_exec(_dbHandle, "INSERT INTO android_metadata VALUES('en_US')" ,NULL,0,NULL);

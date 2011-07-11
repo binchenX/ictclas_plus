@@ -6,7 +6,7 @@ all: test_ictclas.c sharedlib
 
 
 fts:
-	g++ -o test_fts -I/usr/local/include  test_ftsict.c -L /usr/lib -lsqlite3 -lpthread -ldl
+	g++ -o test_fts -I/usr/local/include  test_ftsict.c -L/usr/lib/trident/ -lsqlite3 -lpthread -ldl
 
 lib: fts3_ictclas.c sharedlib 
 	g++ -fPIC -I/usr/local/include -I./Source -c fts3_ictclas.c
